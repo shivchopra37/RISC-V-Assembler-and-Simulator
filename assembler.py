@@ -136,4 +136,24 @@ def bracket_handle(instruction):
     instruction.extend(lst2)
     instruction.extend(lst3)
     instruction[2] = int(instruction[2])
+#File Handling 
+count = 0
+with open("input.txt", "r") as file:
+    # Read each line in the file
+    for line in file:
+        instructions.append(line)
+        count+=1
+labels={}
+variables={}
+lines=1
+for i in instructions:
+    if len(i.split())==0:
+        continue
+    if ":" in i.split()[0]:
+        if (i.split()[0][:-1] in R_type.keys()) or (i.split()[0][:-1] in I_type.keys()) or (i.split()[0][:-1] in S_type.keys()) or (i.split()[0][:-1] in B_type.keys()) or (i.split()[0][:-1] in U_type.keys()) or (i.split()[0][:-1] in J_type.keys()):
+            print("Instruction cannot be used as Label")
+            sys.exit()
+        labels[i.split()[0][:-1]]=lines
+        lines+=1
+
 
