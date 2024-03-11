@@ -74,4 +74,40 @@ def instruction_to_machine_code(instruction, count):
             instruction[3] = int(instruction[3])
             imm = instruction[3]
             return f"{twos_complement(imm)}{rs1}{func3}{rd}{opcode}"
+    elif instruction[0] in S_type:
+        bracket_handle(instruction)
+        x = twos_complement(instruction[2])
+        x = str(x)
+        opcode = S_type[instruction[0]]
+        func3 = S_type_func3[instruction[0]]
+        rs2 = reg_dict[instruction[1]]
+        rs1 = reg_dict[instruction[3]]
+        return f"{x[0:7]}{rs2}{rs1}{func3}{x[7:12]}{opcode}"
+    
+    elif instruction[0] in B_type:
+        opcode = B_type[instruction[0]]
+        func3 = B_type_func3[instruction[0]]
+        print(instruction[0])
+        print(func3)
+        rs2 = reg_dict[instruction[2]]
+        rs1 = reg_dict[instruction[1]]
+        if instruction[3] not in labels:
+            instruction[3] = int(instruction[3])
+            x = twos_complement(instruction[3])
+            x = str(x)
+            
+            return f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[8:]}{x[1]}{opcode}"
+        else:
+            x = twos_complement((count - labels[instruction[3]])*4)
+            x = str(x)
+            
+            return f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[8:]}{x[1]}{opcode}"
+    
+    
+    elif instruction[0] in U_type:
+        opcode = U_type[instruction[0]]
+        register = reg_dict[instruction[1]]
+        instruction[2] = int(instruction[2])
+        x = twos_complement_bits(instruction[2],32)
+        return f"{x[:20]}{register}{opcode}"
 
