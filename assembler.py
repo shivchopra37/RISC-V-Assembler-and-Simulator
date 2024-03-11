@@ -111,20 +111,19 @@ def instruction_to_machine_code(instruction, count):
         x = twos_complement_bits(instruction[2],32)
         return f"{x[:20]}{register}{opcode}"
 
-elif instruction[0] in J_type:
-        opcode = J_type[instruction[0]]
-        register = reg_dict[instruction[1]]
-        instruction[2] = int(instruction[2])
-        x = twos_complement_bits(instruction[2],21)
-        x = str(x)
-        x1 = x[0]
-        x2 = x[10:20]
-        x3 = x[9]
-        x4 = x[1:9]
-        return f"{x1}{x2}{x3}{x4}{register}{opcode}"
-    
+    elif instruction[0] in J_type:
+            opcode = J_type[instruction[0]]
+            register = reg_dict[instruction[1]]
+            instruction[2] = int(instruction[2])
+            x = twos_complement_bits(instruction[2],21)
+            x = str(x)
+            x1 = x[0]
+            x2 = x[10:20]
+            x3 = x[9]
+            x4 = x[1:9]
+            return f"{x1}{x2}{x3}{x4}{register}{opcode}"
         
-
+        
 # Example usage:
 instructions = []
 
