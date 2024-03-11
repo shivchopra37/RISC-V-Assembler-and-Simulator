@@ -43,10 +43,10 @@ def instruction_to_machine_code(instruction, count):
     rs1 = ""
     rs2 = ""
     imm = ""
-
+    
     if ":" in instruction[0]:
         instruction.pop(0)
-
+        
     if instruction[0] in R_type:
         opcode = R_type[instruction[0]]
         func3 = R_type_func3[instruction[0]]
@@ -55,9 +55,9 @@ def instruction_to_machine_code(instruction, count):
         rs1 = reg_dict[instruction[2]]
         rs2 = reg_dict[instruction[3]]
         return f"{func7}{rs2}{rs1}{func3}{rd}{opcode}"
-
+    
     elif instruction[0] in I_type:
-
+        
         if instruction[0] == "lw":
             bracket_handle(instruction)
             opcode = I_type[instruction[0]]
@@ -74,6 +74,7 @@ def instruction_to_machine_code(instruction, count):
             instruction[3] = int(instruction[3])
             imm = instruction[3]
             return f"{twos_complement(imm)}{rs1}{func3}{rd}{opcode}"
+    
     elif instruction[0] in S_type:
         bracket_handle(instruction)
         x = twos_complement(instruction[2])
@@ -87,8 +88,6 @@ def instruction_to_machine_code(instruction, count):
     elif instruction[0] in B_type:
         opcode = B_type[instruction[0]]
         func3 = B_type_func3[instruction[0]]
-        print(instruction[0])
-        print(func3)
         rs2 = reg_dict[instruction[2]]
         rs1 = reg_dict[instruction[1]]
         if instruction[3] not in labels:
@@ -100,7 +99,6 @@ def instruction_to_machine_code(instruction, count):
         else:
             x = twos_complement((count - labels[instruction[3]])*4)
             x = str(x)
-            
             return f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[8:]}{x[1]}{opcode}"
     
     
@@ -110,23 +108,37 @@ def instruction_to_machine_code(instruction, count):
         instruction[2] = int(instruction[2])
         x = twos_complement_bits(instruction[2],32)
         return f"{x[:20]}{register}{opcode}"
-
     elif instruction[0] in J_type:
-            opcode = J_type[instruction[0]]
-            register = reg_dict[instruction[1]]
-            instruction[2] = int(instruction[2])
-            x = twos_complement_bits(instruction[2],21)
-            x = str(x)
-            x1 = x[0]
-            x2 = x[10:20]
-            x3 = x[9]
-            x4 = x[1:9]
-            return f"{x1}{x2}{x3}{x4}{register}{opcode}"
+        opcode = J_type[instruction[0]]
+        register = reg_dict[instruction[1]]
+        instruction[2] = int(instruction[2])
+        x = twos_complement_bits(instruction[2],21)
+        x = str(x)
+        x1 = x[0]
+        x2 = x[10:20]
+        x3 = x[9]
+        x4 = x[1:9]
+        return f"{x1}{x2}{x3}{x4}{register}{opcode}"
+    
         
-        
-# Example usage:
-instructions = []
 
+# Example usage:
+instructions = [
+    # "add ra,t0,gp", # 00000000001100101000000010110011
+    # "sub t1,s0,a0", # 01000000101001000000001100110011
+    # "sll a1,t2,t3", # 00000001110000111001010110110011
+    # "slt s1,a2,s2", # 00000001001001100010010010110011
+    # "sltu s3,a3,s4", # 00000001010001101011100110110011
+    # "xor s5,a4,s6", # 00000001011001110100101010110011
+    # "srl s7,a5,s8", # 00000001100001111101101110110011
+    # "or s9,a6,s10", # 00000001101010000110110010110011
+    # "and s11,a7,s0", # 00000000100010001111110110110011
+    # "beq zero,zero,0", # 00000000000000000000000001100011
+    # "auipc s2,-30", #11111111111111111111100100010111
+    # "jal ra,-1024", #11000000000111111111000011101111
+    # "blt s5,s6,16"
+
+]
 def bracket_handle(instruction):
     lst2 = instruction[2].split("(")
     lst3 = lst2[1].split(")")
