@@ -1,4 +1,6 @@
 import sys
+from sys import stdout,stdin,exit
+
 final = []
 # OPCODES
 R_type = {'add': '0110011', 'sub': '0110011', 'sll': '0110011','slt': '0110011', 'sltu': '0110011', 'xor': '0110011','srl': '0110011', 'or': '0110011', 'and': '0110011'}
@@ -97,15 +99,15 @@ def instruction_to_machine_code(instruction, count):
         rs1 = reg_dict[instruction[1]]
         if instruction[3] not in labels:
             instruction[3] = int(instruction[3])
-            x = twos_complement(instruction[3])
+            x = twos_complement_bits(instruction[3],13)
             x = str(x)
-            final.append(f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[8:]}{x[1]}{opcode}")
-            return f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[8:]}{x[1]}{opcode}"
+            final.append(f"{x[0]}{x[2:8]}{rs2}{rs1}{func3}{x[8:12]}{x[1]}{opcode}")
+            return f"{x[0]}{x[2:8]}{rs2}{rs1}{func3}{x[8:12]}{x[1]}{opcode}"
         else:
-            x = twos_complement((count - labels[instruction[3]])*4)
+            x = twos_complement_bits(((+count -labels[instruction[3]])*4),13)
             x = str(x)
-            final.append(f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[7:11]}{x[1]}{opcode}")
-            return f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[7:11]}{x[1]}{opcode}"
+            final.append(f"{x[0]}{x[2:8]}{rs2}{rs1}{func3}{x[8:12]}{x[1]}{opcode}")
+            return f"{x[0]}{x[2:8]}{rs2}{rs1}{func3}{x[8:12]}{x[1]}{opcode}"
     
     
     elif instruction[0] in U_type:
@@ -143,7 +145,10 @@ def bracket_handle(instruction):
     instruction[2] = int(instruction[2])
 #File Handling 
 count = 0
-with open("input.txt", "r") as file:
+infile = sys.argv[1]
+outfile = sys.argv[2]
+
+with open(f"{infile}", "r") as file:
     # Read each line in the file
     for line in file:
         instructions.append(line)
@@ -176,7 +181,8 @@ for instruction in instructions:
         for i in lst1:
             instruction_parts.append(i)
     machine_code = instruction_to_machine_code(instruction_parts, line_Number)
-with open("output.txt","w") as o:
+
+with open(f"{outfile}","w") as o:
     for i in final:
         o.write(i)
         o.write("\n")
