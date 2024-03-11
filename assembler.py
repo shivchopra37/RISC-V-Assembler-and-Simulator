@@ -19,3 +19,59 @@ def twos_complement(num):
 def twos_complement_bits(num,bits):
     return bin(num & (2**bits - 1))[2:].zfill(bits)
 
+reg_dict = {
+    "zero": "00000", "ra": "00001", "sp": "00010", "gp": "00011", "tp": "00100",
+    "t0": "00101", "t1": "00110", "t2": "00111", "s0": "01000", "fp": "01000",
+    "s1": "01001", "a0": "01010", "a1": "01011", "a2": "01100", "a3": "01101",
+    "a4": "01110", "a5": "01111", "a6": "10000", "a7": "10001", "s2": "10010",
+    "s3": "10011", "s4": "10100", "s5": "10101", "s6": "10110", "s7": "10111",
+    "s8": "11000", "s9": "11001", "s10": "11010", "s11": "11011", "t3": "11100",
+    "t4": "11101", "t5": "11110", "t6": "11111"
+}
+
+funct7 = {
+    "add":   "0000000", "sub":   "0100000", "sll":   "0000000",
+    "slt":   "0000000", "sltu":  "0000000", "xor":   "0000000",
+    "srl":   "0000000", "or":    "0000000", "and":   "0000000"
+}
+
+def instruction_to_machine_code(instruction, count):
+    opcode = ""
+    func3 = ""
+    func7 = ""
+    rd = ""
+    rs1 = ""
+    rs2 = ""
+    imm = ""
+
+    if ":" in instruction[0]:
+        instruction.pop(0)
+
+    if instruction[0] in R_type:
+        opcode = R_type[instruction[0]]
+        func3 = R_type_func3[instruction[0]]
+        func7 = funct7[instruction[0]]
+        rd = reg_dict[instruction[1]]
+        rs1 = reg_dict[instruction[2]]
+        rs2 = reg_dict[instruction[3]]
+        return f"{func7}{rs2}{rs1}{func3}{rd}{opcode}"
+
+    elif instruction[0] in I_type:
+
+        if instruction[0] == "lw":
+            bracket_handle(instruction)
+            opcode = I_type[instruction[0]]
+            func3 = I_type_func3[instruction[0]]
+            rd = reg_dict[instruction[1]]
+            rs1 = reg_dict[instruction[3]]
+            imm = instruction[2]
+            return f"{twos_complement(imm)}{rs1}{func3}{rd}{opcode}"
+        else:
+            opcode = I_type[instruction[0]]
+            func3 = I_type_func3[instruction[0]]
+            rd = reg_dict[instruction[1]]
+            rs1 = reg_dict[instruction[2]]
+            instruction[3] = int(instruction[3])
+            imm = instruction[3]
+            return f"{twos_complement(imm)}{rs1}{func3}{rd}{opcode}"
+
