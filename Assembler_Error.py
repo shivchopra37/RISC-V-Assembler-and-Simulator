@@ -48,13 +48,14 @@ def error_R_type(instruction,count):
     else:
         return 1
     
+    
 def error_I_type(instruction,count):
     imm_val=instruction[3]
     check = 1
     # print(imm_val)
     if imm_val!="":
         for elt in imm_val:
-            if (elt not in '1234567890'):
+            if (elt not in '-1234567890'):
                 check=0
                 break
     else:
@@ -139,13 +140,23 @@ def error_B_type(instruction,count):
         return 0
     elif check==0:
         final.append("Error: "+instruction[3]+" is not an immediate value, line = "+str(count))
-        return 0 
+        exit(1)
     elif int(imm_val)<-4096 or int(imm_val)>4095:
         final.append("Error: Immediate values is out of range (12 bits), line = "+str(count))
         return 0
     else:
         return 1
 def error_U_type(instruction,count):
+    imm_val=instruction[2]
+    check = 1
+    # print(imm_val)
+    if imm_val!="":
+        for elt in imm_val:
+            if elt not in '-1234567890':
+                check=0
+                break
+    else:
+        check = 1
     if len(instruction)!=3:
         final.append("Error: "+(instruction[0])+" instruction must have 2 parameters, line = "+str(count))
         return 0
@@ -155,12 +166,12 @@ def error_U_type(instruction,count):
     elif instruction[1] not in reg_dict:
         final.append("Error: No such register is available, line = "+str(count))
         return 0
-    elif not instruction[2].isdigit():
-        final.append("Error: " + instruction[2] + " is not an immediate value, line = " + str(count))
-        return False
     elif not -1048576 <= int(instruction[2]) <= 1048575:
         final.append("Error: Immediate value is out of range (-1048576 to 1048575), line = " + str(count))
         return False
+    elif check==0:
+        final.append("Error: "+instruction[2]+" is not an immediate value, line = "+str(count))
+        return 0
     else:
         return True 
 def error_J_type(instruction,count):
