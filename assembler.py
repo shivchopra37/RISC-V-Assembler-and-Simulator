@@ -156,4 +156,24 @@ for i in instructions:
         labels[i.split()[0][:-1]]=lines
         lines+=1
 
+line_Number = 0
+for instruction in instructions:
+    line_Number+=1
+    instruction_parts = [part for part in instruction.strip().split(" ")]
+    # print(instruction_parts)
+    # while instruction_parts[0] == "":
+    #     instruction_parts.pop(0)
+    if len(instruction_parts) == 2:
+        lst1 = instruction_parts[1].split(",")
+        instruction_parts.pop()
+        for i in lst1:
+            instruction_parts.append(i)
+    else:
+        lst1 = instruction_parts[2].split(",")
+        instruction_parts.pop()
+        for i in lst1:
+            instruction_parts.append(i)
+    # print(instruction_parts)
+    machine_code = instruction_to_machine_code(instruction_parts, line_Number)
+    print(machine_code)
 
