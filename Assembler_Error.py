@@ -101,7 +101,7 @@ def error_S_type(instruction,count):
     # print(imm_val)
     if imm_val!="":
         for elt in imm_val:
-            if elt not in '1234567890' or elt not in '-123456789':
+            if elt not in '-1234567890':
                 check=0
                 break
     else:
@@ -126,7 +126,7 @@ def error_B_type(instruction,count):
     if ":" not in instruction[0]:
         if imm_val!="":
             for elt in imm_val:
-                if elt not in '1234567890':
+                if elt not in '-1234567890':
                     check=0
                     break
                 else:
@@ -140,7 +140,7 @@ def error_B_type(instruction,count):
         return 0
     elif check==0:
         final.append("Error: "+instruction[3]+" is not an immediate value, line = "+str(count))
-        exit(1)
+        return 0
     elif int(imm_val)<-4096 or int(imm_val)>4095:
         final.append("Error: Immediate values is out of range (12 bits), line = "+str(count))
         return 0
@@ -180,7 +180,7 @@ def error_J_type(instruction,count):
     # print(imm_val)
     if imm_val!="":
         for elt in imm_val:
-            if elt not in '1234567890' or elt not in '-123456789':
+            if elt not in '-1234567890':
                 check=0
                 break
     else:
