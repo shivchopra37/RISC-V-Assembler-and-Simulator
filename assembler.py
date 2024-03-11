@@ -1,4 +1,5 @@
 import sys
+final = []
 # OPCODES
 R_type = {'add': '0110011', 'sub': '0110011', 'sll': '0110011','slt': '0110011', 'sltu': '0110011', 'xor': '0110011','srl': '0110011', 'or': '0110011', 'and': '0110011'}
 I_type = {'lw': '0000011', 'addi': '0010011', 'sltiu': '0010011','jalr': '1100111'}
@@ -54,6 +55,7 @@ def instruction_to_machine_code(instruction, count):
         rd = reg_dict[instruction[1]]
         rs1 = reg_dict[instruction[2]]
         rs2 = reg_dict[instruction[3]]
+        final.append(f"{func7}{rs2}{rs1}{func3}{rd}{opcode}")
         return f"{func7}{rs2}{rs1}{func3}{rd}{opcode}"
     
     elif instruction[0] in I_type:
@@ -65,6 +67,7 @@ def instruction_to_machine_code(instruction, count):
             rd = reg_dict[instruction[1]]
             rs1 = reg_dict[instruction[3]]
             imm = instruction[2]
+            final.append(f"{twos_complement(imm)}{rs1}{func3}{rd}{opcode}")
             return f"{twos_complement(imm)}{rs1}{func3}{rd}{opcode}"
         else:
             opcode = I_type[instruction[0]]
@@ -73,6 +76,7 @@ def instruction_to_machine_code(instruction, count):
             rs1 = reg_dict[instruction[2]]
             instruction[3] = int(instruction[3])
             imm = instruction[3]
+            final.append(f"{twos_complement(imm)}{rs1}{func3}{rd}{opcode}")
             return f"{twos_complement(imm)}{rs1}{func3}{rd}{opcode}"
     
     elif instruction[0] in S_type:
@@ -83,6 +87,7 @@ def instruction_to_machine_code(instruction, count):
         func3 = S_type_func3[instruction[0]]
         rs2 = reg_dict[instruction[1]]
         rs1 = reg_dict[instruction[3]]
+        final.append(f"{x[0:7]}{rs2}{rs1}{func3}{x[7:12]}{opcode}")
         return f"{x[0:7]}{rs2}{rs1}{func3}{x[7:12]}{opcode}"
     
     elif instruction[0] in B_type:
@@ -94,12 +99,13 @@ def instruction_to_machine_code(instruction, count):
             instruction[3] = int(instruction[3])
             x = twos_complement(instruction[3])
             x = str(x)
-            
+            final.append(f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[8:]}{x[1]}{opcode}")
             return f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[8:]}{x[1]}{opcode}"
         else:
             x = twos_complement((count - labels[instruction[3]])*4)
             x = str(x)
-            return f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[8:]}{x[1]}{opcode}"
+            final.append(f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[7:11]}{x[1]}{opcode}")
+            return f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[7:11]}{x[1]}{opcode}"
     
     
     elif instruction[0] in U_type:
@@ -107,6 +113,7 @@ def instruction_to_machine_code(instruction, count):
         register = reg_dict[instruction[1]]
         instruction[2] = int(instruction[2])
         x = twos_complement_bits(instruction[2],32)
+        final.append(f"{x[:20]}{register}{opcode}")
         return f"{x[:20]}{register}{opcode}"
     elif instruction[0] in J_type:
         opcode = J_type[instruction[0]]
@@ -118,13 +125,13 @@ def instruction_to_machine_code(instruction, count):
         x2 = x[10:20]
         x3 = x[9]
         x4 = x[1:9]
+        final.append(f"{x1}{x2}{x3}{x4}{register}{opcode}")
         return f"{x1}{x2}{x3}{x4}{register}{opcode}"
     
         
 
 # Example usage:
 instructions = []
-
 def bracket_handle(instruction):
     lst2 = instruction[2].split("(")
     lst3 = lst2[1].split(")")
@@ -169,5 +176,7 @@ for instruction in instructions:
         for i in lst1:
             instruction_parts.append(i)
     machine_code = instruction_to_machine_code(instruction_parts, line_Number)
-    print(machine_code)
-
+with open("output.txt","w") as o:
+    for i in final:
+        o.write(i)
+        o.write("\n")
