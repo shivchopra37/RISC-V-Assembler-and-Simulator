@@ -102,10 +102,10 @@ def instruction_to_machine_code(instruction, count):
             final.append(f"{x[0]}{x[2:8]}{rs2}{rs1}{func3}{x[8:12]}{x[1]}{opcode}")
             return f"{x[0]}{x[2:8]}{rs2}{rs1}{func3}{x[8:12]}{x[1]}{opcode}"
         else:
-            x = twos_complement_bits((count - labels[instruction[3]])*4)
+            x = twos_complement_bits(-4*(count - labels[instruction[3]]),13)
             x = str(x)
             final.append(f"{x[0]}{x[2:8]}{rs2}{rs1}{func3}{x[8:12]}{x[1]}{opcode}")
-            return f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[7:11]}{x[1]}{opcode}"
+            return f"{x[0]}{x[2:8]}{rs2}{rs1}{func3}{x[8:12]}{x[1]}{opcode}"
     
     
     elif instruction[0] in U_type:
@@ -115,16 +115,25 @@ def instruction_to_machine_code(instruction, count):
         x = twos_complement_bits(instruction[2],32)
         final.append(f"{x[:20]}{register}{opcode}")
         return f"{x[:20]}{register}{opcode}"
+    
     elif instruction[0] in J_type:
         opcode = J_type[instruction[0]]
         register = reg_dict[instruction[1]]
-        instruction[2] = int(instruction[2])
-        x = twos_complement_bits(instruction[2],21)
-        x = str(x)
-        x1 = x[0]
-        x2 = x[10:20]
-        x3 = x[9]
-        x4 = x[1:9]
+        if instruction[2] not in labels:
+            instruction[2] = int(instruction[2])
+            x = twos_complement_bits(instruction[2],21)
+            x = str(x)
+            x1 = x[0]
+            x2 = x[10:20]
+            x3 = x[-11]
+            x4 = x[1:9]
+        else:
+            x = twos_complement_bits((-4*(count - labels[instruction[2]])),21)
+            x = str(x)
+            x1 = x[0]
+            x2 = x[10:20]
+            x3 = x[-11]
+            x4 = x[1:9]
         final.append(f"{x1}{x2}{x3}{x4}{register}{opcode}")
         return f"{x1}{x2}{x3}{x4}{register}{opcode}"
     else:
@@ -149,7 +158,7 @@ with open("input.txt", "r") as file:
         count+=1
 labels={}
 variables={}
-lines=1
+lines = 0
 for i in instructions:
     if len(i.split())==0:
         continue
@@ -158,10 +167,10 @@ for i in instructions:
             print("Instruction cannot be used as Label")
             sys.exit()
         labels[i.split()[0][:-1]]=lines
-        lines+=1
+        # print(labels)
+    lines+=1
 line_Number = 0
-for instruction in instructions:
-    line_Number+=1
+for instruction in instructions: 
     instruction_parts = [part for part in instruction.strip().split(" ")]
     if len(instruction_parts) == 2:
         lst1 = instruction_parts[1].split(",")
@@ -174,6 +183,9 @@ for instruction in instructions:
         for i in lst1:
             instruction_parts.append(i)
     machine_code = instruction_to_machine_code(instruction_parts, line_Number)
+    line_Number+=1 
+
+    
 counts = 0
 with open("output.txt","w") as o:
     for i in final:
