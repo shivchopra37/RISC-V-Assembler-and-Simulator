@@ -1,7 +1,4 @@
-
 import sys
-from sys import stdout,stdin,exit
-
 final = []
 # OPCODES
 R_type = {'add': '0110011', 'sub': '0110011', 'sll': '0110011','slt': '0110011', 'sltu': '0110011', 'xor': '0110011','srl': '0110011', 'or': '0110011', 'and': '0110011'}
@@ -105,10 +102,10 @@ def instruction_to_machine_code(instruction, count):
             final.append(f"{x[0]}{x[2:8]}{rs2}{rs1}{func3}{x[8:12]}{x[1]}{opcode}")
             return f"{x[0]}{x[2:8]}{rs2}{rs1}{func3}{x[8:12]}{x[1]}{opcode}"
         else:
-            x = twos_complement_bits(((+count -labels[instruction[3]])*4),13)
+            x = twos_complement_bits((count - labels[instruction[3]])*4)
             x = str(x)
             final.append(f"{x[0]}{x[2:8]}{rs2}{rs1}{func3}{x[8:12]}{x[1]}{opcode}")
-            return f"{x[0]}{x[2:8]}{rs2}{rs1}{func3}{x[8:12]}{x[1]}{opcode}"
+            return f"{x[0]}{x[1:7]}{rs2}{rs1}{func3}{x[7:11]}{x[1]}{opcode}"
     
     
     elif instruction[0] in U_type:
@@ -130,9 +127,8 @@ def instruction_to_machine_code(instruction, count):
         x4 = x[1:9]
         final.append(f"{x1}{x2}{x3}{x4}{register}{opcode}")
         return f"{x1}{x2}{x3}{x4}{register}{opcode}"
-    
-        
-
+    else:
+        final.append("Error : No Such instruction found in line : "+str(count))
 # Example usage:
 instructions = []
 def bracket_handle(instruction):
@@ -146,10 +142,7 @@ def bracket_handle(instruction):
     instruction[2] = int(instruction[2])
 #File Handling 
 count = 0
-infile = sys.argv[1]
-outfile = sys.argv[2]
-
-with open(f"{infile}", "r") as file:
+with open("input.txt", "r") as file:
     # Read each line in the file
     for line in file:
         instructions.append(line)
@@ -166,7 +159,6 @@ for i in instructions:
             sys.exit()
         labels[i.split()[0][:-1]]=lines
         lines+=1
-
 line_Number = 0
 for instruction in instructions:
     line_Number+=1
@@ -182,8 +174,13 @@ for instruction in instructions:
         for i in lst1:
             instruction_parts.append(i)
     machine_code = instruction_to_machine_code(instruction_parts, line_Number)
-
-with open(f"{outfile}","w") as o:
+counts = 0
+with open("output.txt","w") as o:
     for i in final:
-        o.write(i)
-        o.write("\n")
+        counts+=1
+        if counts!=count:
+            o.write(i)
+            o.write("\n")
+        else:
+            o.write(i)
+        
