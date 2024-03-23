@@ -63,3 +63,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Contributing
 
 Feel free to contribute to this project by opening issues or pull requests. Any improvements or suggestions are welcome!
+[![Typing SVG](https://readme-typing-svg.demolab.com/CO+PROJECT=First+line+of+text;Second+line+of+text)](https://git.io/typing-svg)
