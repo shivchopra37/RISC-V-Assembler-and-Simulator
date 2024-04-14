@@ -195,4 +195,3 @@ with open("output.txt","w") as o:
             o.write("\n")
         else:
             o.write(i)
-        
