@@ -1,5 +1,5 @@
 final = []
-instructions = []
+instructions = [] # List to store instructions
 
 # print("HELLO")
 reg_dict = {0: 'zero', 1: 'ra', 2: 'sp', 3: 'gp', 4: 'tp',5: 't0', 6: 't1',
