@@ -1,3 +1,9 @@
+reg_dict = {'zero': 0, 'ra': 1, 'sp': 2, 'gp': 3, 'tp': 4, 't0': 5, 't1': 6,
+  't2': 7, 's0': 8, 'fp': 8, 's1': 9, 'a0': 10, 'a1': 11, 'a2': 12,
+    'a3': 13, 'a4': 14, 'a5': 15, 'a6': 16, 'a7': 17, 's2': 18, 's3': 19,
+      's4': 20, 's5': 21, 's6': 22, 's7': 23, 's8': 24, 's9': 25, 's10': 26,
+        's11': 27, 't3': 28, 't4': 29, 't5': 30, 't6': 31}
+
 #code for R-type instruction
 def execute_r_type_instruction(instruction, rd, rs1, rs2, registers):
     if instruction == "ADD":
@@ -21,6 +27,7 @@ def execute_r_type_instruction(instruction, rd, rs1, rs2, registers):
 
 #code for I-type instruction
 def execute_i_type_instruction(instruction, rd, rs1, imm, registers):
+    global pc
     if instruction == "ADDI":
         registers[rd] = registers[rs1] + imm
     elif instruction == "LW":
@@ -30,7 +37,6 @@ def execute_i_type_instruction(instruction, rd, rs1, imm, registers):
     elif instruction == "JALR":
         registers[rd] = pc + 4
         pc = registers[rs1] + imm 
-
 #code for S-type instruction
 def execute_s_type_instruction(instruction, rs1, rs2, imm, registers):
     if instruction == "SW":
@@ -38,6 +44,7 @@ def execute_s_type_instruction(instruction, rs1, rs2, imm, registers):
 
 #code for B-type instruction
 def execute_b_type_instruction(instruction, rs1, rs2, imm, registers):
+    global pc
     if instruction == "BEQ":
         if registers[rs1] == registers[rs2]:
             pc = pc + imm
@@ -65,11 +72,12 @@ def execute_u_type_instruction(instruction, rd, imm, registers):
         registers[rd] = pc + imm << 12
 
 #code for J-type instruction
-def execute_j_type_instruction(instruction, rd, imm, registers):    
+def execute_j_type_instruction(instruction, rd, imm, registers):   
+    global pc 
     if instruction == "JAL":
         registers[rd] = pc + 4
         pc = pc + imm
-    
+   
 # Define registers and memory
 registers = [0] * 32  # Initialize registers
 memory = [0] * 1024    # Initialize memory
@@ -85,10 +93,7 @@ def update_pc(pc, imm):
     return pc + sign_extend(imm, 12)
 
 #input binary num
-
 pc=0
-
-
 # Function to decode and execute instructions
 def execute_instruction(binary, pc, registers):
     opcode=binary[-7:]
@@ -121,7 +126,8 @@ def execute_instruction(binary, pc, registers):
         elif funct3 == "111":
             instruction = "AND"
         execute_r_type_instruction(instruction, int(rd, 2), int(rs1, 2), int(rs2, 2), registers)
-        print("Result of", instruction, "operation:", registers[int(rd, 2)])
+        x = (registers[int(rd, 2)])
+        print("Result of", instruction, "operation:", "0b"+format(x,'032b'))
 
     # I-type instruction
     if opcode == "0000011" or opcode == "0010011" or opcode == "1100111":
@@ -139,9 +145,10 @@ def execute_instruction(binary, pc, registers):
         elif opcode == "1100111":
             instruction = "JALR"
         execute_i_type_instruction(instruction, int(rd, 2), int(rs1, 2), int(imm, 2), registers)
-        print("Result of", instruction, "operation:", registers[int(rd, 2)])
+        x = (registers[int(rd, 2)])
+        print("Result of", instruction, "operation:","0b"+format(x,'032b'))
 
-    # S-type instruction
+    # S-type instruction        #DOES NOT PRINT
     if opcode == "0100011":
         imm = binary[:7] + binary[20:25]
         rs2 = binary[7:12]
@@ -151,9 +158,9 @@ def execute_instruction(binary, pc, registers):
         if funct3 == "010":
             instruction = "SW"
         execute_s_type_instruction(instruction, int(rs1, 2), int(rs2, 2), int(imm, 2), registers)
-        print("Result of", instruction, "operation:", registers[int(rd, 2)])
-
-    # B-type instruction
+        x = (registers[int(rd, 2)])
+        # print("Result of", instruction, "operation:", "0b"+format(x,'032b'))
+    # B-type instruction       #DOES NOT PRINT ANYTHING
     if opcode== "1100011":
         imm = binary[:1] + binary[24:31] + binary[1:7] + binary[20:24] + "0"
         rs2 = binary[7:12]
@@ -173,7 +180,8 @@ def execute_instruction(binary, pc, registers):
         elif funct3 == "111":
             instruction = "BGEU"
         execute_b_type_instruction(instruction, int(rs1, 2), int(rs2, 2), int(imm, 2), registers)
-        print("Result of", instruction, "operation:", registers[int(rd, 2)])
+        print(pc)
+        # print("Result of", instruction, "operation:", registers[int(, 2)])
 
     # U-type instruction
     if opcode == "0110111" or opcode == "0010111":
@@ -185,7 +193,8 @@ def execute_instruction(binary, pc, registers):
         elif opcode == "0010111":
             instruction = "AUIPC"
         execute_u_type_instruction(instruction, int(rd, 2), int(imm, 2), registers)
-        print("Result of", instruction, "operation:", registers[int(rd, 2)])
+        x = (registers[int(rd, 2)])
+        print("Result of", instruction, "operation:", "0b"+format(x,'032b'))
 
     # J-type instruction
     if opcode == "1101111":
@@ -195,18 +204,19 @@ def execute_instruction(binary, pc, registers):
         if opcode == "1101111":
             instruction = "JAL"
         execute_j_type_instruction(instruction, int(rd, 2), int(imm, 2), registers)
-        print("Result of", instruction, "operation:", registers[int(rd, 2)])
-
-binary="00000000000000000000010010110011"
-execute_instruction(binary, pc, registers)
-
-binary="00000000000000000000100100110011"
-execute_instruction(binary, pc, registers)
+        x = (registers[int(rd, 2)])
+        print("Result of", instruction, "operation:", "0b"+format(x,'032b'))
 
 
+for i in range(18):
+    binary = str(input())
+    execute_instruction(binary, pc, registers)
+
+# binary="00000000000000000000100100110011"
+# execute_instruction(binary, pc, registers)
 #Handling of immediate values: Make sure you're converting immediate values correctly from binary to integer.
-#
-print ("PC value is: ", pc)
+# print ("PC value is: ", pc)
 #code to print value of all registers
-for i in range(32):
-    print("value of register",i,registers[i])
+# for i in range(32):
+    # print("value of register",i,registers[i])                     
+
