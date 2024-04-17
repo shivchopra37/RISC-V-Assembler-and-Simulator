@@ -37,6 +37,7 @@ def execute_i_type_instruction(instruction, rd, rs1, imm, registers):
     elif instruction == "JALR":
         registers[rd] = pc + 4
         pc = registers[rs1] + imm 
+
 #code for S-type instruction
 def execute_s_type_instruction(instruction, rs1, rs2, imm, registers):
     if instruction == "SW":
@@ -98,6 +99,7 @@ pc=0
 def execute_instruction(binary, pc, registers):
     opcode=binary[-7:]
     pc=pc+4
+
     # R-type instruction
     if opcode == "0110011":
         funct7 = binary[:7]
@@ -148,6 +150,7 @@ def execute_instruction(binary, pc, registers):
         x = (registers[int(rd, 2)])
         print("Result of", instruction, "operation:","0b"+format(x,'032b'))
 
+
     # S-type instruction        #DOES NOT PRINT
     if opcode == "0100011":
         imm = binary[:7] + binary[20:25]
@@ -160,6 +163,8 @@ def execute_instruction(binary, pc, registers):
         execute_s_type_instruction(instruction, int(rs1, 2), int(rs2, 2), int(imm, 2), registers)
         x = (registers[int(rd, 2)])
         # print("Result of", instruction, "operation:", "0b"+format(x,'032b'))
+
+
     # B-type instruction       #DOES NOT PRINT ANYTHING
     if opcode== "1100011":
         imm = binary[:1] + binary[24:31] + binary[1:7] + binary[20:24] + "0"
@@ -219,4 +224,3 @@ for i in range(18):
 #code to print value of all registers
 # for i in range(32):
     # print("value of register",i,registers[i])                     
-
